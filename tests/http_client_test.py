@@ -19,7 +19,6 @@ def test_429_error_handling(mocker):
     
     assert httpx.get.call_count == 10  # Should retry 10 times before giving up
 
-
 def test_401_error_thrown(mocker):
     mock_response = mocker.Mock()
     mock_response.status_code = 401
@@ -29,4 +28,16 @@ def test_401_error_thrown(mocker):
     client = HTTPXClient()
     
     with pytest.raises(NotAuthorizedError):
+        client.get("http://test.com")
+
+
+def test_422_error_thrown(mocker):
+    mock_response = mocker.Mock()
+    mock_response.status_code = 422
+    
+    mocker.patch('httpx.get', return_value=mock_response)
+
+    client = HTTPXClient()
+    
+    with pytest.raises(httpx.HTTPStatusError):
         client.get("http://test.com")
