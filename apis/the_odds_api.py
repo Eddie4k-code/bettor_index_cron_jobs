@@ -6,7 +6,7 @@ from schemas.OddsAPIResponses import OddsAPIEvent, OddsAPIProp
 
 class TheOddsAPI(BettingDataAPIInterface):
     def __init__(self, api_config: APIConfig, http_client: HTTPClient):
-        self.api_key = api_config.api_key
+        self.api_key = api_config.get_api_key()
         self.http_client = http_client
 
     def get_events(self, sport: str, hours_ahead: int) -> list[OddsAPIEvent]:
@@ -19,21 +19,19 @@ class TheOddsAPI(BettingDataAPIInterface):
             list[OddsAPIEvent]: A list of events with their details.
         """
 
-        commence_time_to = (datetime.utcnow() + timedelta(hours=hours_ahead)).isoformat() + 'Z'
+        commence_time_to = (datetime.utcnow() + timedelta(hours=hours_ahead)).replace(microsecond=0).isoformat() + 'Z'
 
         url = f"https://api.the-odds-api.com/v4/sports/{sport}/events"
 
-        params = {
-            "apiKey": self.api_key,
-            "commenceTimeTo": commence_time_to
-        }
+        params = {"apiKey": self.api_key, "commenceTimeTo": commence_time_to}
+
 
         response = self.http_client.get(url, params=params)
 
         return [OddsAPIEvent(**event) for event in response.json()]
     
 
-    def get_props_based_on_events(self, sport: str, events: list[OddsAPIEvent], markets:str) -> list[OddsAPIProp]:
+    def get_props_based_on_events(self, sport: str, events: list[OddsAPIEvent], markets:str, regions: str = "us") -> list[OddsAPIProp]:
         """
         For each event in the provided list, fetch prop (market) data using the Odds API event odds endpoint.
         Args:
@@ -46,7 +44,7 @@ class TheOddsAPI(BettingDataAPIInterface):
         results = []
         for event in events:
             url = f"https://api.the-odds-api.com/v4/sports/{sport}/events/{event.id}/odds"
-            params = {"apiKey": self.api_key}
+            params = {"apiKey": self.api_key, "markets": markets, "regions": regions}
             response = self.http_client.get(url, params=params)
             results.append(OddsAPIProp(**response.json()))
         return results
