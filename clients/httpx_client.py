@@ -23,6 +23,10 @@ class HTTPXClient(HTTPClient):
                 if response.status_code == 401:
                     logger.error("Unauthorized access - check your API key.")
                     raise NotAuthorizedError("Unauthorized access - check your API key.")
+                
+                if response.status_code == 422:
+                    logger.error("Unprocessable Entity - check your request parameters.")
+                    raise httpx.HTTPStatusError("Unprocessable Entity - check your request parameters.", request=response.request, response=response)
 
                 return response
             
