@@ -131,4 +131,3 @@ def test_odds_api_get_props_based_on_events_parses_full_prop_response(mock_api_c
     assert props[0].bookmakers[0].markets[0].outcomes[0].description == "LeBron James"
     assert props[0].bookmakers[0].markets[0].outcomes[0].price == -110
     assert props[0].bookmakers[0].markets[0].outcomes[0].point == 27.5
-

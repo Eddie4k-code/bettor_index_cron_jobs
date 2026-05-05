@@ -72,3 +72,5 @@ ENV/
 
 # GitHub workflows artifacts
 .github/workflows/*.log
+test.db
+api.env
