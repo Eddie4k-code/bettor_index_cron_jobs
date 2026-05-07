@@ -23,5 +23,4 @@ def main():
         the_odds_api = TheOddsAPI(api_config, http_client)
         props_pipeline = PropsPipeline(props_repository, the_odds_api)
         props_pipeline.get_props(24, sport="basketball_nba", markets="player_points")
-
 main()

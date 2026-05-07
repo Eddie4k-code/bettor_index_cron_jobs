@@ -95,8 +95,12 @@ class PropsRepository(PropsRepositoryInterface):
         for prop_data in flat_props:
             prop = OddsAPIProp(**prop_data)
             self.db.merge(prop)  # Upsert: insert or update by composite PK
-        self.db.commit()
-
+        try:
+            self.db.commit()
+        except Exception as e:
+            logger.error(f"Error saving props: {e}")
+            self.db.rollback()
+            raise
     def get_props_by_hours_ahead(self, hours_ahead: int):
         """
         Retrieve props from the database for a specific number of hours ahead.
