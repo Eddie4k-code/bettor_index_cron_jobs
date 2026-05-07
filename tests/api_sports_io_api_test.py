@@ -33,6 +33,7 @@ def test_sports_io_api_get_teams_200(http_client_mock: HTTPClient, mock_api_conf
 
     teams_response = api.get_teams(sport="basketball_nba", season=2023)
 
+    assert isinstance(teams_response, SportsStatsApiTeamResponse)
     assert hasattr(teams_response, "teams")
     assert isinstance(teams_response.teams, list)
     assert len(teams_response.teams) == 2
