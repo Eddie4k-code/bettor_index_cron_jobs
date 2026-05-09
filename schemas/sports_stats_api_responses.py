@@ -21,8 +21,8 @@ class GamesSchema(BaseModel):
 	home_team_id: int
 	away_team: str
 	away_team_id: int
-	home_team_score: int
-	away_team_score: int
+	home_team_score: Optional[int] = None
+	away_team_score: Optional[int] = None
 	
 
 class SportsStatsAPIGamesResponse(BaseModel):
