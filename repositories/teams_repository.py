@@ -24,3 +24,18 @@ class TeamsRepository(TeamsRepositoryInterface):
             logger.error(f"Error inserting/updating team: {team.name} (ID: {team.id}) - {str(e)}")
             self.db.rollback()
             raise e
+        
+    def get_teams(self, sport: str):
+        """
+        Fetch all teams for a given sport.
+        Args:
+            sport (str): The sport key to filter teams by.
+        Returns:
+            list[Team]: List of Team objects for the sport.
+        """
+        from db.models.team import Team
+        try:
+            return self.db.query(Team).filter_by(sport_key=sport).all()
+        except Exception as e:
+            logger.error(f"Error fetching teams for sport: {sport} - {str(e)}")
+            raise e
