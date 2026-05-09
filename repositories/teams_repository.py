@@ -21,5 +21,6 @@ class TeamsRepository(TeamsRepositoryInterface):
             self.db.commit()
             logger.info(f"Inserted/Updated team: {team.name} (ID: {team.id})")
         except Exception as e:
+            logger.error(f"Error inserting/updating team: {team.name} (ID: {team.id}) - {str(e)}")
             self.db.rollback()
             raise e

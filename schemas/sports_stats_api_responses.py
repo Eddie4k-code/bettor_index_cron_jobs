@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import datetime
 
 class TeamSchema(BaseModel):
 	id: int
@@ -14,7 +15,7 @@ class SportsStatsApiTeamResponse(BaseModel):
 class GamesSchema(BaseModel):
 	id: int
 	season: int
-	date: str
+	date: datetime
 	status: str
 	home_team: str
 	home_team_id: int

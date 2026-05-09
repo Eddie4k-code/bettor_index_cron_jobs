@@ -3,6 +3,7 @@ from interfaces.sports_stats_api_interface import SportsStatsAPIInterface
 from apis.api_config import APIConfig
 from interfaces.http_client_interface import HTTPClient
 from schemas.sports_stats_api_responses import SportsStatsApiTeamResponse, TeamSchema, GamesSchema, SportsStatsAPIGamesResponse
+from datetime import datetime
 
 
 class SportsIOAPI(SportsStatsAPIInterface):
@@ -43,7 +44,7 @@ class SportsIOAPI(SportsStatsAPIInterface):
                 games.append(GamesSchema(
                     id=game["id"],
                     season=game["season"],
-                    date=game["date"]["start"],
+                    date=datetime.fromisoformat(game["date"]["start"].replace("Z", "+00:00")),
                     status=game["status"]["long"],
                     home_team=game["teams"]["home"]["name"],
                     home_team_id=game["teams"]["home"]["id"],
