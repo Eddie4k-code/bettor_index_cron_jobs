@@ -29,4 +29,10 @@ class SportsStatsAPIGamesResponse(BaseModel):
     games: List[GamesSchema]
 	
 
-    
+class PlayersSchema(BaseModel):
+    id: int
+    firstname: str
+    lastname: str
+
+class SportsStatsAPIPlayersResponse(BaseModel):
+	players: List[PlayersSchema]   

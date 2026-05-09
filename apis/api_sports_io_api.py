@@ -4,7 +4,7 @@ from apis.api_config import APIConfig
 from interfaces.http_client_interface import HTTPClient
 from schemas.sports_stats_api_responses import SportsStatsApiTeamResponse, TeamSchema, GamesSchema, SportsStatsAPIGamesResponse
 from datetime import datetime
-
+from schemas.sports_stats_api_responses import PlayersSchema, SportsStatsAPIPlayersResponse
 
 class SportsIOAPI(SportsStatsAPIInterface):
     def __init__(self, api_config: APIConfig, http_client: HTTPClient):
@@ -55,3 +55,26 @@ class SportsIOAPI(SportsStatsAPIInterface):
                 ))
 
             return SportsStatsAPIGamesResponse(games=games)
+
+
+    def get_players(self, team_id: int, season: int):
+            """
+            Fetch players for a given team and season from the Sports IO API and transform to PlayersSchema.
+            Args:
+                team_id (int): The team ID.
+                season (int): The season year.
+            Returns:
+                SportsStatsAPIPlayersResponse: Response containing a list of players.
+            """
+            response = self.http_client.get(
+                f"https://v2.nba.api-sports.io/players",
+                headers={"x-apisports-key": self.api_key},
+                params={"team": team_id, "season": season}
+            )
+            data = response.json()
+            players = [PlayersSchema(
+                id=player["id"],
+                firstname=player["firstname"],
+                lastname=player["lastname"]
+            ) for player in data.get("response", [])]
+            return SportsStatsAPIPlayersResponse(players=players)

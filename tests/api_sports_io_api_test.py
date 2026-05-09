@@ -5,7 +5,7 @@ from apis.api_sports_io_api import SportsIOAPI
 from apis.api_config import APIConfig
 from interfaces.http_client_interface import HTTPClient
 from interfaces.sports_stats_api_interface import SportsStatsAPIInterface
-from schemas.sports_stats_api_responses import SportsStatsAPIGamesResponse, SportsStatsApiTeamResponse, TeamSchema
+from schemas.sports_stats_api_responses import SportsStatsAPIGamesResponse, SportsStatsApiTeamResponse, TeamSchema, SportsStatsAPIPlayersResponse, PlayersSchema
 
 @pytest.fixture
 def mock_api_config():
@@ -84,6 +84,38 @@ def test_sports_io_api_get_games_200(http_client_mock: HTTPClient, mock_api_conf
     assert len(games_response.games) == 2   
     assert games_response.games[0].home_team == "Team A"
     assert games_response.games[0].away_team == "Team B"
+
+
+def test_sports_io_api_get_players_200(http_client_mock: HTTPClient, mock_api_config: APIConfig):
+    api = SportsIOAPI(api_config=mock_api_config, http_client=http_client_mock)
+    http_client_mock.get.return_value.status_code = 200
+    http_client_mock.get.return_value.json.return_value = {
+        "response": [
+            {
+                "id": 382,
+                "firstname": "Dejounte",
+                "lastname": "Murray",
+                "birth": {"date": "1996-09-19", "country": "USA"},
+                "nba": {"start": 2016, "pro": 4},
+                "height": {"feets": "6", "inches": "4", "meters": "1.93"},
+                "weight": {"pounds": "180", "kilograms": "81.6"},
+                "college": "Washington",
+                "affiliation": "Washington/USA",
+                "leagues": {"standard": {"jersey": 5, "active": True, "pos": "G"}}
+            }
+        ]
+    }
+
+    players_response = api.get_players(team_id=1, season=2023)
+
+    assert isinstance(players_response, SportsStatsAPIPlayersResponse)
+    assert hasattr(players_response, "players")
+    assert isinstance(players_response.players, list)
+    assert len(players_response.players) == 1
+    player = players_response.players[0]
+    assert player.id == 382
+    assert player.firstname == "Dejounte"
+    assert player.lastname == "Murray"
 
 
 
