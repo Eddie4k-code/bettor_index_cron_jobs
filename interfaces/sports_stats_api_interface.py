@@ -3,5 +3,5 @@ from typing import Optional
 
 class SportsStatsAPIInterface(ABC):
     @abstractmethod
-    def get_teams(self, sport: str, season: Optional[int] = None) -> dict:
+    def get_teams(self, sport: str) -> dict:
         pass

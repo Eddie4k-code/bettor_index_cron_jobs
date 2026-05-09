@@ -1,5 +1,9 @@
+import logging
+
 from interfaces.teams_repository_interface import TeamsRepositoryInterface
 from db.models.team import Team
+
+logger = logging.getLogger(__name__)
 
 class TeamsRepository(TeamsRepositoryInterface):
     def __init__(self, db):
@@ -15,6 +19,7 @@ class TeamsRepository(TeamsRepositoryInterface):
 
         try:
             self.db.commit()
+            logger.info(f"Inserted/Updated team: {team.name} (ID: {team.id})")
         except Exception as e:
             self.db.rollback()
             raise e

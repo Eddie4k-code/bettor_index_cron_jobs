@@ -9,6 +9,10 @@ from clients.httpx_client import HTTPXClient
 import os
 from dotenv import load_dotenv
 from db.models.base import Base
+from pipelines.teams_pipeline import TeamsPipeline
+from apis.api_sports_io_api import SportsIOAPI
+from repositories.teams_repository import TeamsRepository
+
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -17,10 +21,10 @@ logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
 def main():
     with get_db() as db:
         Base.metadata.create_all(db.get_bind())  # Create tables if they don't exist
-        props_repository = PropsRepository(db)
-        api_config = APIConfig(api_key_env_var="ODDS_API_KEY")
+        teams_repository = TeamsRepository(db)
+        sports_stats_api_config = APIConfig(api_key_env_var="SPORTS_STATS_API_KEY")
         http_client = HTTPXClient()
-        the_odds_api = TheOddsAPI(api_config, http_client)
-        props_pipeline = PropsPipeline(props_repository, the_odds_api)
-        props_pipeline.get_props(24, sport="basketball_nba", markets="player_points")
+        sports_stats_api = SportsIOAPI(sports_stats_api_config, http_client)  # Using SportsIOAPI for sports stats
+        team_pipeline = TeamsPipeline(teams_repository, sports_stats_api)
+        team_pipeline.get_teams(sport="basketball_nba")
 main()

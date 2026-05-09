@@ -6,7 +6,7 @@ class TeamSchema(BaseModel):
 	name: str
 	nickname: str
 	code: str
-	city: str
+	city: Optional[str] = None
 
 class SportsStatsApiTeamResponse(BaseModel):
 	teams: List[TeamSchema]

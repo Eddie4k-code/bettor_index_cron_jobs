@@ -9,19 +9,17 @@ class SportsIOAPI(SportsStatsAPIInterface):
         self.api_key = api_config.get_api_key()
         self.http_client = http_client
 
-    def get_teams(self, sport: str, season: int = None) -> SportsStatsApiTeamResponse:
+    def get_teams(self, sport: str) -> SportsStatsApiTeamResponse:
         """
-        Fetch teams for a given sport and season from the Sports IO API.
+        Fetch teams for a given sport from the Sports IO API.
         Args:
             sport (str): The sport for which to fetch teams (e.g., 'basketball_nba').
-            season (int, optional): The season year (e.g., 2023). If None, fetches current season teams.
         Returns:
             SportsStatsApiTeamResponse: Response containing a list of teams.
         """
-        # ...existing code...
-        response = self.http_client.get(f"https://v2.nba-api-sports.io/teams", headers={"x-apisports-key": self.api_key})
+        response = self.http_client.get(f"https://v2.nba.api-sports.io/teams", headers={"x-apisports-key": self.api_key})
         data = response.json()
-        teams = [TeamSchema(**team) for team in data.get("teams", [])]
+        teams = [TeamSchema(**team) for team in data.get("response", [])]
         return SportsStatsApiTeamResponse(teams=teams)
 
 

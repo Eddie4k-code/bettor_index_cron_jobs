@@ -25,13 +25,13 @@ def test_sports_io_api_get_teams_200(http_client_mock: HTTPClient, mock_api_conf
     api = SportsIOAPI(api_config=mock_api_config, http_client=http_client_mock)
     http_client_mock.get.return_value.status_code = 200
     http_client_mock.get.return_value.json.return_value = {
-        "teams": [
+        "response": [
             {"id": 1, "name": "Team A", "nickname": "A", "code": "TA", "city": "CityA"},
             {"id": 2, "name": "Team B", "nickname": "B", "code": "TB", "city": "CityB"}
         ]
     }
 
-    teams_response = api.get_teams(sport="basketball_nba", season=2023)
+    teams_response = api.get_teams(sport="basketball_nba")
 
     assert isinstance(teams_response, SportsStatsApiTeamResponse)
     assert hasattr(teams_response, "teams")
