@@ -10,3 +10,14 @@ class PlayersRepositoryInterface(ABC):
             player (Player): The Player object to insert.
         """
         pass
+
+    @abstractmethod
+    def get_players(self, sport: str):
+        """
+        Fetch all players for a given sport.
+        Args:
+            sport (str): The sport key to filter players by.
+        Returns:
+            list[Player]: List of Player objects for the sport.
+        """
+        pass
