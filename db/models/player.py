@@ -7,4 +7,4 @@ class Player(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     team_id = Column(Integer, nullable=False)
-    sport_key = Column(String, nullable=False, index=True)
+    sport_key = Column(String, nullable=False, index=True, primary_key=True)

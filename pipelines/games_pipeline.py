@@ -30,5 +30,6 @@ class GamesPipeline(GamesPipelineInterface):
                     away_team=game_schema.away_team.lower() if game_schema.away_team else "unknown",
                     away_team_id=game_schema.away_team_id,
                     home_team_score=game_schema.home_team_score if game_schema.home_team_score is not None else 0,
-                    away_team_score=game_schema.away_team_score if game_schema.away_team_score is not None else 0
+                    away_team_score=game_schema.away_team_score if game_schema.away_team_score is not None else 0,
+                    sport_key=sport.lower() if sport else None
                 ))

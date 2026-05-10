@@ -19,8 +19,8 @@ class PlayersPipeline(PlayersPipelineInterface):
         from db.models.player import Player
         return Player(
             id=player_schema.id,
-            first_name=player_schema.firstname,
-            last_name=player_schema.lastname,
+            first_name=player_schema.firstname.lower() if hasattr(player_schema.firstname, 'lower') else player_schema.firstname,
+            last_name=player_schema.lastname.lower() if hasattr(player_schema.lastname, 'lower') else player_schema.lastname,
             team_id=team_id,
             sport_key=sport
         )

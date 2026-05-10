@@ -13,4 +13,4 @@ class Game(Base):
     away_team_id = Column(Integer, nullable=False, primary_key=True)
     home_team_score = Column(Integer, nullable=False)
     away_team_score = Column(Integer, nullable=False)
-    #sport_key = Column(String, nullable=False, primary_key=True)
+    sport_key = Column(String, nullable=False, primary_key=True)

@@ -33,7 +33,8 @@ def test_insert_game(repository):
         away_team="Team B",
         away_team_id=2,
         home_team_score=0,
-        away_team_score=0
+        away_team_score=0,
+        sport_key="basketball_nba"
     )
 
     # Act: insert the game
