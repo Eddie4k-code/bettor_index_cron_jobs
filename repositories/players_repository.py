@@ -17,3 +17,10 @@ class PlayersRepository(PlayersRepositoryInterface):
             self.db.rollback()
             logger.error(f"Error inserting/updating player: {player.id} - {str(e)}")
             raise e
+        
+    def get_players(self, sport: str):
+        try:
+            return self.db.query(Player).filter_by(sport_key=sport).all()
+        except Exception as e:
+            logger.error(f"Error fetching players for sport: {sport} - {str(e)}")
+            raise e
