@@ -93,39 +93,43 @@ class SportsIOAPI(SportsStatsAPIInterface):
         response = self.http_client.get(
             f"https://v2.nba.api-sports.io/players/statistics",
             headers={"x-apisports-key": self.api_key},
-            params={"player": player_id, "season": season}
+            params={"id": player_id, "season": season}
         )
         data = response.json()
-        stats_data = data.get("response", [{}])[0]
-        from schemas.sports_stats_api_responses import PlayerStatsSchemaNBA, SportsStatsAPIPlayerStatsResponse
-        stats = PlayerStatsSchemaNBA(
-            player_id=stats_data.get("player", {}).get("id"),
-            firstname=stats_data.get("player", {}).get("firstname"),
-            lastname=stats_data.get("player", {}).get("lastname"),
-            team_id=stats_data.get("team", {}).get("id"),
-            game_id=stats_data.get("game", {}).get("id"),
-            season=stats_data.get("season"),
-            min=stats_data.get("min"),
-            points=stats_data.get("points"),
-            pos=stats_data.get("pos"),
-            fgm=stats_data.get("fgm"),
-            fga=stats_data.get("fga"),
-            fgp=stats_data.get("fgp"),
-            ftm=stats_data.get("ftm"),
-            fta=stats_data.get("fta"),
-            ftp=stats_data.get("ftp"),
-            tpm=stats_data.get("tpm"),
-            tpa=stats_data.get("tpa"),
-            tpp=stats_data.get("tpp"),
-            offReb=stats_data.get("offReb"),
-            defReb=stats_data.get("defReb"),
-            totReb=stats_data.get("totReb"),
-            assists=stats_data.get("assists"),
-            pFouls=stats_data.get("pFouls"),
-            steals=stats_data.get("steals"),
-            turnovers=stats_data.get("turnovers"),
-            blocks=stats_data.get("blocks")
-        )
-        return SportsStatsAPIPlayerStatsResponse(stats=stats)
+        stats_data = data.get("response", [])
+
+        stats_list = []
+        for game in stats_data:
+            stats = PlayerStatsSchemaNBA(
+                player_id=game.get("player", {}).get("id"),
+                firstname=game.get("player", {}).get("firstname"),
+                lastname=game.get("player", {}).get("lastname"),
+                team_id=game.get("team", {}).get("id"),
+                game_id=game.get("game", {}).get("id"),
+                season=season,
+                min=game.get("min"),
+                points=game.get("points"),
+                pos=game.get("pos"),
+                fgm=game.get("fgm"),
+                fga=game.get("fga"),
+                fgp=game.get("fgp"),
+                ftm=game.get("ftm"),
+                fta=game.get("fta"),
+                ftp=game.get("ftp"),
+                tpm=game.get("tpm"),
+                tpa=game.get("tpa"),
+                tpp=game.get("tpp"),
+                offReb=game.get("offReb"),
+                defReb=game.get("defReb"),
+                totReb=game.get("totReb"),
+                assists=game.get("assists"),
+                pFouls=game.get("pFouls"),
+                steals=game.get("steals"),
+                turnovers=game.get("turnovers"),
+                blocks=game.get("blocks")
+            )
+            stats_list.append(stats)
+
+        return SportsStatsAPIPlayerStatsResponse(stats=stats_list)
 
 

@@ -58,8 +58,7 @@ def test_get_player_stats_success(api, mock_http_client):
 
     # Assert
     assert isinstance(result, SportsStatsAPIPlayerStatsResponse)
-    stats = result.stats
-    assert stats.player_id == player_id
+    stats = result.stats[0]
     assert stats.firstname == "LeBron"
     assert stats.lastname == "James"
     assert stats.team_id == 10

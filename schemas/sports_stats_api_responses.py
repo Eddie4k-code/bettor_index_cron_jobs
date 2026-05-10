@@ -68,4 +68,4 @@ class PlayerStatsSchemaNBA(BaseModel):
 	
 	
 class SportsStatsAPIPlayerStatsResponse(BaseModel):
-    stats: PlayerStatsSchemaNBA
+    stats: List[PlayerStatsSchemaNBA]

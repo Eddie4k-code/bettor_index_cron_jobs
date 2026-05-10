@@ -17,7 +17,7 @@ def test_get_player_stats_nba_calls_api_and_inserts():
     player_id = 23
     season = 2023
     sport = "basketball_nba"
-    nba_stats = PlayerStatsSchemaNBA(player_id=player_id, firstname="lebron", lastname="james", team_id=1, game_id=100, season=season)
+    nba_stats = [PlayerStatsSchemaNBA(player_id=player_id, firstname="lebron", lastname="james", team_id=1, game_id=100, season=season)]
     mock_api.get_player_stats.return_value = SportsStatsAPIPlayerStatsResponse(stats=nba_stats)
     mock_players_repo.get_players.return_value = [Mock(id=player_id)]
     mock_processing_repo.is_processed.return_value = False
