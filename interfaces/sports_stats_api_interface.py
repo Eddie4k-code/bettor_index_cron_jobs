@@ -21,3 +21,15 @@ class SportsStatsAPIInterface(ABC):
             SportsStatsAPIPlayersResponse: Response containing a list of players.
         """
         pass
+
+    @abstractmethod
+    def get_player_stats(self, player_id: int, season: int):
+        """
+        Fetch stats for a given player and season.
+        Args:
+            player_id (int): The player ID.
+            season (int): The season year.
+        Returns:
+            SportsStatsAPIPlayerStatsResponse: Response containing player stats.
+        """
+        pass

@@ -5,6 +5,7 @@ from interfaces.http_client_interface import HTTPClient
 from schemas.sports_stats_api_responses import SportsStatsApiTeamResponse, TeamSchema, GamesSchema, SportsStatsAPIGamesResponse
 from datetime import datetime
 from schemas.sports_stats_api_responses import PlayersSchema, SportsStatsAPIPlayersResponse
+from schemas.sports_stats_api_responses import PlayerStatsSchemaNBA, SportsStatsAPIPlayerStatsResponse
 
 class SportsIOAPI(SportsStatsAPIInterface):
     def __init__(self, api_config: APIConfig, http_client: HTTPClient):
@@ -78,3 +79,53 @@ class SportsIOAPI(SportsStatsAPIInterface):
                 lastname=player["lastname"]
             ) for player in data.get("response", [])]
             return SportsStatsAPIPlayersResponse(players=players)
+    
+
+    def get_player_stats(self, player_id: int, season: int, sport: str):
+        """
+        Fetch stats for a given player and season from the Sports IO API.
+        Args:
+            player_id (int): The player ID.
+            season (int): The season year.
+        Returns:
+            SportsStatsAPIPlayerStatsResponse: Response containing player stats.
+        """
+        response = self.http_client.get(
+            f"https://v2.nba.api-sports.io/players/statistics",
+            headers={"x-apisports-key": self.api_key},
+            params={"player": player_id, "season": season}
+        )
+        data = response.json()
+        stats_data = data.get("response", [{}])[0]
+        from schemas.sports_stats_api_responses import PlayerStatsSchemaNBA, SportsStatsAPIPlayerStatsResponse
+        stats = PlayerStatsSchemaNBA(
+            player_id=stats_data.get("player", {}).get("id"),
+            firstname=stats_data.get("player", {}).get("firstname"),
+            lastname=stats_data.get("player", {}).get("lastname"),
+            team_id=stats_data.get("team", {}).get("id"),
+            game_id=stats_data.get("game", {}).get("id"),
+            season=stats_data.get("season"),
+            min=stats_data.get("min"),
+            points=stats_data.get("points"),
+            pos=stats_data.get("pos"),
+            fgm=stats_data.get("fgm"),
+            fga=stats_data.get("fga"),
+            fgp=stats_data.get("fgp"),
+            ftm=stats_data.get("ftm"),
+            fta=stats_data.get("fta"),
+            ftp=stats_data.get("ftp"),
+            tpm=stats_data.get("tpm"),
+            tpa=stats_data.get("tpa"),
+            tpp=stats_data.get("tpp"),
+            offReb=stats_data.get("offReb"),
+            defReb=stats_data.get("defReb"),
+            totReb=stats_data.get("totReb"),
+            assists=stats_data.get("assists"),
+            pFouls=stats_data.get("pFouls"),
+            steals=stats_data.get("steals"),
+            turnovers=stats_data.get("turnovers"),
+            blocks=stats_data.get("blocks")
+        )
+        return SportsStatsAPIPlayerStatsResponse(stats=stats)
+
+
