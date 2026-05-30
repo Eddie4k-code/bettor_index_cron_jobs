@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
 from db.models.base import Base
 
 class NBAPlayerStats(Base):
@@ -30,3 +30,4 @@ class NBAPlayerStats(Base):
     turnovers = Column(Integer, nullable=True)
     blocks = Column(Integer, nullable=True)
     sport_key = Column(String, nullable=False, index=True, primary_key=True)
+    commence_time = Column(DateTime, nullable=False)

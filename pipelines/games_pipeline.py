@@ -20,6 +20,8 @@ class GamesPipeline(GamesPipelineInterface):
             response = self.api.get_games(sport, season, team_id)
             games_data = response["games"] if isinstance(response, dict) else getattr(response, "games", [])
             for game_schema in games_data:
+                if game_schema.status.lower() != 'finished':
+                    continue  # Only process finished games for now
                 self.games_repository.insert_games(Game(
                     id=game_schema.id,
                     season=game_schema.season,

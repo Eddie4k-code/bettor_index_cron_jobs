@@ -44,7 +44,7 @@ class TheOddsAPI(BettingDataAPIInterface):
         results = []
         for event in events:
             url = f"https://api.the-odds-api.com/v4/sports/{sport}/events/{event.id}/odds"
-            params = {"apiKey": self.api_key, "markets": markets, "regions": regions}
+            params = {"apiKey": self.api_key, "markets": markets, "regions": regions, "oddsFormat": "american"}
             response = self.http_client.get(url, params=params)
             results.append(OddsAPIProp(**response.json()))
         return results

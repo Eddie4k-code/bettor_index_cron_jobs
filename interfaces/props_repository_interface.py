@@ -20,3 +20,18 @@ class PropsRepositoryInterface(ABC):
             list: List of props for the given number of hours ahead.
         """
         pass
+
+    @abstractmethod
+    def get_props_by_composite_key(self, event_id: int, bookmaker: str, market_key: str, outcome_name: str, outcome_description: str):
+        """
+        Retrieve props from the database using a composite key.
+        Args:
+            event_id (int): The event ID.
+            bookmaker (str): The bookmaker name.
+            market_key (str): The market key.
+            outcome_name (str): The outcome name.
+            outcome_description (str): The outcome description.
+        Returns:
+            list: List of props matching the composite key.
+        """
+        pass

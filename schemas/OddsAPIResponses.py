@@ -20,6 +20,7 @@ class OddsAPIOutcome(BaseModel):
     price: Union[int, float]
     description: Optional[str] = None
     point: Optional[float] = None
+    player_id: Optional[int] = None  # New field to link to player if applicable
 
 class OddsAPIMarket(BaseModel):
     key: str

@@ -21,3 +21,15 @@ class PlayersRepositoryInterface(ABC):
             list[Player]: List of Player objects for the sport.
         """
         pass
+
+    @abstractmethod
+    def get_player_by_name(self, first_name: str, last_name: str, sport: str):
+        """
+        Fetch a player by their first name, last name, and sport.
+        Args:
+            first_name (str): The player's first name.
+            last_name (str): The player's last name.
+            sport (str): The sport key to filter players by.
+        Returns:
+            list[Player]: List of Player objects matching the name and sport.
+        """
