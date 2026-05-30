@@ -93,6 +93,10 @@ class PropsRepository(PropsRepositoryInterface):
             else:
                 logger.error(f"Unrecognized prop format: {item}")
         for prop_data in flat_props:
+            # Log composite key for debugging
+            logger.debug(
+                f"Saving prop: event_id={prop_data['event_id']}, bookmaker={prop_data['bookmaker']}, market_key={prop_data['market_key']}, outcome_name={prop_data['outcome_name']}, outcome_description={prop_data['outcome_description']}, outcome_point={prop_data.get('outcome_point')}"
+            )
             prop = OddsAPIProp(**prop_data)
             self.db.merge(prop)  # Upsert: insert or update by composite PK
         try:
@@ -115,3 +119,27 @@ class PropsRepository(PropsRepositoryInterface):
             OddsAPIProp.commence_time >= now,
             OddsAPIProp.commence_time <= future
         ).all()
+
+
+    def get_props_by_composite_key(self, event_id, bookmaker, market_key, outcome_name, outcome_description):
+            """
+            Retrieve a single prop from the database using the composite key fields.
+            Args:
+                event_id (str): The event ID.
+                bookmaker (str): The bookmaker name.
+                market_key (str): The market key.
+                outcome_name (str): The outcome name.
+                outcome_description (str): The outcome description.
+            Returns:
+                OddsAPIProp or None: The prop matching the composite key, or None if not found.
+            """
+            from db.models.odds_api_prop import OddsAPIProp
+            return self.db.query(OddsAPIProp).filter_by(
+                event_id=event_id,
+                bookmaker=bookmaker,
+                market_key=market_key,
+                outcome_name=outcome_name,
+                outcome_description=outcome_description
+            ).first()
+
+    

@@ -1,15 +1,18 @@
+from datetime import datetime
+
 from interfaces.sports_stats_api_interface import SportsStatsAPIInterface
 from interfaces.player_stats_pipeline_interface import PlayerStatsPipelineInterface
 from interfaces.players_repository_interface import PlayersRepositoryInterface
 from interfaces.nba_player_stats_repository_interface import NBAPlayerStatsRepositoryInterface
 from db.models.nba_player_stats import NBAPlayerStats
-
+from interfaces.games_repository_interface import GamesRepositoryInterface
 
 class PlayerStatsPipeline(PlayerStatsPipelineInterface):
-    def __init__(self, sports_stats_api: SportsStatsAPIInterface, players_repository: PlayersRepositoryInterface, nba_player_stats_repository: NBAPlayerStatsRepositoryInterface):
+    def __init__(self, sports_stats_api: SportsStatsAPIInterface, players_repository: PlayersRepositoryInterface, nba_player_stats_repository: NBAPlayerStatsRepositoryInterface, games_repository: GamesRepositoryInterface):
         self.sports_stats_api = sports_stats_api
         self.players_repository = players_repository
         self.nba_player_stats_repository = nba_player_stats_repository
+        self.games_repository = games_repository
 
     def get_player_stats(self, sport: str, season: int):
         if sport == 'basketball_nba':
@@ -20,9 +23,15 @@ class PlayerStatsPipeline(PlayerStatsPipelineInterface):
                 # Fetch stats for each player
                 player_stats_response = self.sports_stats_api.get_player_stats(player_id=player.id, season=season, sport=sport)
 
-
-
                 for stat in player_stats_response.stats:
+                    # Fetch Game Date
+
+                    game = self.games_repository.get_game(stat.game_id, sport)
+
+                    if game is None:
+                        print(f"Warning: Game with ID {stat.game_id} not found for player ID {player.id}. Skipping stats for this game.")
+                        continue
+
                     print(f"Processing stats for player ID: {player.id}, season: {stat.season}, game ID: {stat.game_id}")
                     self.nba_player_stats_repository.insert_player_stats(player_stats=NBAPlayerStats(
                         player_id=player.id,
@@ -51,6 +60,7 @@ class PlayerStatsPipeline(PlayerStatsPipelineInterface):
                         steals=stat.steals,
                         turnovers=stat.turnovers,
                         blocks=stat.blocks,
-                        sport_key=sport
+                        sport_key=sport,
+                        commence_time=game.date
                     ))
             

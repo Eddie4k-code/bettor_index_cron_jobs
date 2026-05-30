@@ -24,3 +24,10 @@ class PlayersRepository(PlayersRepositoryInterface):
         except Exception as e:
             logger.error(f"Error fetching players for sport: {sport} - {str(e)}")
             raise e
+        
+    def get_player_by_name(self, first_name: str, last_name: str, sport: str):
+        try:
+            return self.db.query(Player).filter_by(first_name=first_name, last_name=last_name, sport_key=sport).all()
+        except Exception as e:
+            logger.error(f"Error fetching player by name: {first_name} {last_name} for sport: {sport} - {str(e)}")
+            raise e
