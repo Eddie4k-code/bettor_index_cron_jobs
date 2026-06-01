@@ -101,6 +101,22 @@ def main():
                 props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
             elif args.command == "player_stats":
                 nba_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
+
+        elif args.sport == "baseball_mlb":
+            teams_repository = TeamsRepository(db)
+            players_repository = PlayersRepository(db)
+            games_repository = GamesRepository(db)
+            hit_rate_event_queue_repo = HitRateEventQueueRepository(db)
+            odds_api_prop_history_repo = OddsAPIPropsHistoryRepository(db)
+            props_repository = PropsRepository(db)
+            http_client = HTTPXClient()
+            api_config = APIConfig(api_key_env_var="THE_ODDS_API_KEY")
+            the_odds_api = TheOddsAPI(api_config, http_client)
+            sports_io_api = SportsIOAPI(APIConfig(api_key_env_var="SPORTS_IO_API_KEY"), http_client)
+            teams_pipeline = TeamsPipeline(teams_repository, sports_io_api)
+            games_pipeline = GamesPipeline(games_repository, teams_repository, sports_io_api)
+            players_pipeline = PlayersPipeline(teams_repository, players_repository, sports_io_api)
+            props_pipeline = PropsPipeline(props_repository, the_odds_api, hit_rate_event_queue_repo, odds_api_prop_history_repo, teams_repository, players_repository)
         else:
             logging.error(f"Unsupported sport: {args.sport}")
             exit(1)
