@@ -40,7 +40,7 @@ class PropsPipeline(PropsPipelineInterface):
         logger.info(f"Fetched {len(events)} events. Fetching props for these events.")
         props = self.api.get_props_based_on_events(sport=sport, events=events, markets=markets)
 
-        # Filter out props where any bookmaker is 'bovada'
+        # Filter out props where any bookmaker is not in the allowed list
         filtered_props = []
         for prop in props:
             include = set(["draftkings", "fanduel", "betmgm", "fanatics"])

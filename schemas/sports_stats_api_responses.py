@@ -69,3 +69,70 @@ class PlayerStatsSchemaNBA(BaseModel):
 	
 class SportsStatsAPIPlayerStatsResponse(BaseModel):
     stats: List[PlayerStatsSchemaNBA]
+
+
+# --- BallDontLie MLB schemas ---
+
+class BallDontLieMLBTeamSchema(BaseModel):
+    id: int
+    abbreviation: str
+    display_name: str
+    name: str
+    location: str
+    league: str
+    division: str
+
+class BallDontLieMLBTeamResponse(BaseModel):
+    teams: List[BallDontLieMLBTeamSchema]
+
+class BallDontLieMLBGameSchema(BaseModel):
+    id: int
+    season: int
+    date: Optional[str] = None
+    status: Optional[str] = None
+    home_team_name: str
+    home_team_id: int
+    away_team_name: str
+    away_team_id: int
+    home_runs: Optional[int] = None
+    away_runs: Optional[int] = None
+
+class BallDontLieMLBGamesResponse(BaseModel):
+    games: List[BallDontLieMLBGameSchema]
+
+class BallDontLieMLBPlayerStatsSchema(BaseModel):
+    player_id: int
+    firstname: str
+    lastname: str
+    team_name: Optional[str] = None
+    game_id: int
+    season: int
+    # Batting
+    at_bats: Optional[int] = None
+    hits: Optional[int] = None
+    hr: Optional[int] = None
+    rbi: Optional[int] = None
+    bb: Optional[int] = None
+    k: Optional[int] = None
+    avg: Optional[str] = None
+    obp: Optional[str] = None
+    slg: Optional[str] = None
+    doubles: Optional[int] = None
+    triples: Optional[int] = None
+    stolen_bases: Optional[int] = None
+    plate_appearances: Optional[int] = None
+    total_bases: Optional[int] = None
+    # Pitching
+    ip: Optional[str] = None
+    p_k: Optional[int] = None
+    p_bb: Optional[int] = None
+    er: Optional[int] = None
+    era: Optional[str] = None
+    pitch_count: Optional[int] = None
+    wins: Optional[int] = None
+    losses: Optional[int] = None
+    saves: Optional[int] = None
+    games_started: Optional[int] = None
+
+class BallDontLieMLBPlayerStatsResponse(BaseModel):
+    stats: List[BallDontLieMLBPlayerStatsSchema]
