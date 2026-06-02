@@ -1,13 +1,15 @@
 from abc import abstractmethod, ABC
 from typing import Optional
 
+from schemas.sports_stats_api_responses import BallDontLieMLBGamesResponse, SportsStatsAPIGamesResponse
+
 class SportsStatsAPIInterface(ABC):
     @abstractmethod
     def get_teams(self, sport: str) -> dict:
         pass
 
     @abstractmethod
-    def get_games(self, sport: str, season: int) -> dict:
+    def get_games(self, sport: str, season: int) -> BallDontLieMLBGamesResponse | SportsStatsAPIGamesResponse:
         pass
     
     @abstractmethod
