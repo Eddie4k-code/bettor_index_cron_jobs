@@ -22,7 +22,7 @@ from pipelines.player_stats_pipeline import PlayerStatsPipeline
 from repositories.hit_rate_event_queue_repository import HitRateEventQueueRepository
 from repositories.odds_api_prop_history import OddsAPIPropsHistoryRepository
 import argparse
-
+from apis.ball_dont_lie_mlb_api import BallDontLieMlbAPI
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -112,10 +112,10 @@ def main():
             http_client = HTTPXClient()
             api_config = APIConfig(api_key_env_var="THE_ODDS_API_KEY")
             the_odds_api = TheOddsAPI(api_config, http_client)
-            sports_io_api = SportsIOAPI(APIConfig(api_key_env_var="SPORTS_IO_API_KEY"), http_client)
-            teams_pipeline = TeamsPipeline(teams_repository, sports_io_api)
-            games_pipeline = GamesPipeline(games_repository, teams_repository, sports_io_api)
-            players_pipeline = PlayersPipeline(teams_repository, players_repository, sports_io_api)
+            ball_dont_lie_api_mlb = BallDontLieMlbAPI(APIConfig(api_key_env_var="SPORTS_IO_API_KEY"), http_client)
+            teams_pipeline = TeamsPipeline(teams_repository, ball_dont_lie_api_mlb)
+            games_pipeline = GamesPipeline(games_repository, teams_repository, ball_dont_lie_api_mlb)
+            players_pipeline = PlayersPipeline(teams_repository, players_repository, ball_dont_lie_api_mlb)
             props_pipeline = PropsPipeline(props_repository, the_odds_api, hit_rate_event_queue_repo, odds_api_prop_history_repo, teams_repository, players_repository)
         else:
             logging.error(f"Unsupported sport: {args.sport}")
