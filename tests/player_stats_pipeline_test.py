@@ -1,7 +1,12 @@
 import pytest
 from unittest.mock import Mock
 from pipelines.player_stats_pipeline import PlayerStatsPipeline
-from schemas.sports_stats_api_responses import PlayerStatsSchemaNBA, SportsStatsAPIPlayerStatsResponse
+from schemas.sports_stats_api_responses import (
+    BallDontLieMLBPlayerStatsResponse,
+    BallDontLieMLBPlayerStatsSchema,
+    PlayerStatsSchemaNBA,
+    SportsStatsAPIPlayerStatsResponse,
+)
 
 def test_get_player_stats_nba_calls_api_and_inserts():
     # Arrange
@@ -12,9 +17,9 @@ def test_get_player_stats_nba_calls_api_and_inserts():
     mock_processing_repo = Mock()
     pipeline = PlayerStatsPipeline(
         sports_stats_api=mock_api,
-        nba_player_stats_repository=mock_nba_repo,
-        games_repository=mock_games_repo,
         players_repository=mock_players_repo,
+        games_repository=mock_games_repo,
+        nba_player_stats_repository=mock_nba_repo,
     )
     player_id = 23
     season = 2023
@@ -39,3 +44,68 @@ def test_get_player_stats_nba_calls_api_and_inserts():
     args, kwargs = mock_nba_repo.insert_player_stats.call_args
     player_stats_obj = kwargs.get('player_stats') or (args[0] if args else None)
     assert player_stats_obj.commence_time.isoformat().startswith("2024-01-01T19:00:00"), "commence_time should be set from game.date"
+
+
+def test_get_player_stats_mlb_calls_api_and_inserts():
+    mock_api = Mock()
+    mock_mlb_repo = Mock()
+    mock_games_repo = Mock()
+    mock_players_repo = Mock()
+    pipeline = PlayerStatsPipeline(
+        sports_stats_api=mock_api,
+        players_repository=mock_players_repo,
+        games_repository=mock_games_repo,
+        mlb_player_stats_repository=mock_mlb_repo,
+    )
+    player_id = 42
+    season = 2024
+    sport = "baseball_mlb"
+    mlb_stats = [
+        BallDontLieMLBPlayerStatsSchema(
+            player_id=player_id,
+            firstname="Shohei",
+            lastname="Ohtani",
+            team_name="Dodgers",
+            game_id=200,
+            season=season,
+            at_bats=4,
+            hits=2,
+            hr=1,
+            rbi=3,
+            bb=1,
+            k=0,
+            avg="0.300",
+            obp="0.400",
+            slg="0.650",
+            doubles=1,
+            triples=0,
+            stolen_bases=1,
+            plate_appearances=5,
+            total_bases=5,
+            ip=None,
+            p_k=None,
+            p_bb=None,
+            er=None,
+            era=None,
+            pitch_count=None,
+            wins=None,
+            losses=None,
+            saves=None,
+            games_started=1,
+        )
+    ]
+    mock_api.get_player_stats.return_value = BallDontLieMLBPlayerStatsResponse(stats=mlb_stats)
+    mock_players_repo.get_players.return_value = [Mock(id=player_id)]
+
+    mock_game = Mock()
+    mock_game.date = "2024-06-01T19:00:00"
+    mock_games_repo.get_game.return_value = mock_game
+
+    pipeline.get_player_stats(sport=sport, season=season)
+
+    mock_api.get_player_stats.assert_called_with(player_id=player_id, season=season, sport=sport)
+    mock_games_repo.get_game.assert_called_with(200, sport)
+    args, kwargs = mock_mlb_repo.insert_player_stats.call_args
+    player_stats_obj = kwargs.get('player_stats') or (args[0] if args else None)
+    assert player_stats_obj.team_name == "dodgers"
+    assert player_stats_obj.commence_time.isoformat().startswith("2024-06-01T19:00:00")

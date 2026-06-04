@@ -18,6 +18,7 @@ from repositories.games_repository import GamesRepository
 from pipelines.games_pipeline import GamesPipeline
 from pipelines.players_pipeline import PlayersPipeline
 from repositories.nba_player_stats_repository import NBAPlayerStatsRepository
+from repositories.mlb_player_stats_repository import MLBPlayerStatsRepository
 from pipelines.player_stats_pipeline import PlayerStatsPipeline
 from repositories.hit_rate_event_queue_repository import HitRateEventQueueRepository
 from repositories.odds_api_prop_history import OddsAPIPropsHistoryRepository
@@ -89,7 +90,12 @@ def main():
             games_pipeline = GamesPipeline(games_repository, teams_repository, sports_io_api)
             players_pipeline = PlayersPipeline(teams_repository, players_repository, sports_io_api)
             props_pipeline = PropsPipeline(props_repository, the_odds_api, hit_rate_event_queue_repo, odds_api_prop_history_repo, teams_repository, players_repository)
-            nba_player_stats_pipeline = PlayerStatsPipeline(sports_io_api, players_repository, nba_player_stats_repository, games_repository)
+            nba_player_stats_pipeline = PlayerStatsPipeline(
+                sports_stats_api=sports_io_api,
+                players_repository=players_repository,
+                games_repository=games_repository,
+                nba_player_stats_repository=nba_player_stats_repository,
+            )
             # Run pipelines based on CLI command
             if args.command == "teams":
                 teams_pipeline.get_teams(sport=args.sport)
@@ -106,6 +112,7 @@ def main():
             teams_repository = TeamsRepository(db)
             players_repository = PlayersRepository(db)
             games_repository = GamesRepository(db)
+            mlb_player_stats_repository = MLBPlayerStatsRepository(db)
             hit_rate_event_queue_repo = HitRateEventQueueRepository(db)
             odds_api_prop_history_repo = OddsAPIPropsHistoryRepository(db)
             props_repository = PropsRepository(db)
@@ -117,6 +124,23 @@ def main():
             games_pipeline = GamesPipeline(games_repository, teams_repository, ball_dont_lie_api_mlb)
             players_pipeline = PlayersPipeline(teams_repository, players_repository, ball_dont_lie_api_mlb)
             props_pipeline = PropsPipeline(props_repository, the_odds_api, hit_rate_event_queue_repo, odds_api_prop_history_repo, teams_repository, players_repository)
+            mlb_player_stats_pipeline = PlayerStatsPipeline(
+                sports_stats_api=ball_dont_lie_api_mlb,
+                players_repository=players_repository,
+                games_repository=games_repository,
+                mlb_player_stats_repository=mlb_player_stats_repository,
+            )
+
+            if args.command == "teams":
+                teams_pipeline.get_teams(sport=args.sport)
+            elif args.command == "games":
+                games_pipeline.get_games(sport=args.sport, season=args.season)
+            elif args.command == "players":
+                players_pipeline.get_players(sport=args.sport, season=args.season)
+            elif args.command == "props":
+                props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
+            elif args.command == "player_stats":
+                mlb_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
         else:
             logging.error(f"Unsupported sport: {args.sport}")
             exit(1)
