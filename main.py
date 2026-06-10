@@ -119,7 +119,7 @@ def main():
             http_client = HTTPXClient()
             api_config = APIConfig(api_key_env_var="THE_ODDS_API_KEY")
             the_odds_api = TheOddsAPI(api_config, http_client)
-            ball_dont_lie_api_mlb = BallDontLieMlbAPI(APIConfig(api_key_env_var="SPORTS_IO_API_KEY"), http_client)
+            ball_dont_lie_api_mlb = BallDontLieMlbAPI(APIConfig(api_key_env_var="BALL_DONT_LIE_API_KEY"), http_client)
             teams_pipeline = TeamsPipeline(teams_repository, ball_dont_lie_api_mlb)
             games_pipeline = GamesPipeline(games_repository, teams_repository, ball_dont_lie_api_mlb)
             players_pipeline = PlayersPipeline(teams_repository, players_repository, ball_dont_lie_api_mlb)
