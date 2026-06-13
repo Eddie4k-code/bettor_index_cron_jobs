@@ -66,7 +66,7 @@ class PropsPipeline(PropsPipelineInterface):
                             outcome.description, prop.home_team, prop.away_team, prop.sport_key,
                             self.players_repository, team_name_to_id
                         )
-                        if player_id:
+                        if player_id is not None:
                             outcome.player_id = player_id
                         else:
                             outcome.player_id = None  # or log/flag as unmatched
@@ -95,6 +95,9 @@ class PropsPipeline(PropsPipelineInterface):
                             outcome_name=outcome.name,
                             outcome_description=outcome.description
                         )
+                        resolved_player_id = outcome.player_id
+                        if resolved_player_id is None and existing is not None:
+                            resolved_player_id = getattr(existing, 'player_id', None)
                         # If there is an existing prop and the outcome point has changed, produce a hit rate event
                         if existing:
                             point_changed = existing.outcome_point != outcome.point
@@ -118,7 +121,7 @@ class PropsPipeline(PropsPipelineInterface):
                                     created_at=datetime.utcnow(),
                                     status='pending',
                                     event_type='PropUpdate',
-                                    player_id=outcome.player_id
+                                    player_id=resolved_player_id
                                 )
                                 self.hit_rate_event_queue_repo.produce_event(event)
                                 self.odds_api_prop_history_repo.insert_props_history(
@@ -138,7 +141,7 @@ class PropsPipeline(PropsPipelineInterface):
                                         home_team=existing.home_team.lower(),
                                         away_team=existing.away_team.lower(),
                                         change_type='PointChange',
-                                        player_id=outcome.player_id
+                                        player_id=resolved_player_id
                                     )
                                 )
 
@@ -162,7 +165,7 @@ class PropsPipeline(PropsPipelineInterface):
                                         home_team=existing.home_team.lower(),
                                         away_team=existing.away_team.lower(),
                                         change_type='PriceChange',
-                                        player_id=outcome.player_id
+                                        player_id=resolved_player_id
                                     )
                                 )
 
@@ -184,7 +187,7 @@ class PropsPipeline(PropsPipelineInterface):
                                 created_at=datetime.utcnow(),
                                 status='pending',
                                 event_type='NewProp',
-                                player_id=outcome.player_id
+                                player_id=resolved_player_id
                             )
 
                             self.hit_rate_event_queue_repo.produce_event(event)
@@ -198,16 +201,19 @@ class PropsPipeline(PropsPipelineInterface):
             return None
         # Normalize and split name
         name = outcome_description.strip().lower()
+        logging.info("Name: %s", name)
         parts = name.split()
         if len(parts) < 2:
             return None
         first, last = parts[0], parts[-1]
         # Query for all players with this name in the sport
         candidates = players_repository.get_player_by_name(first, last, sport)
+        logging.info("Found %d candidates for player name '%s %s'", len(candidates), first, last)
         # Map team names to IDs for comparison
         home_team_id = team_name_to_id.get(home_team.lower())
         away_team_id = team_name_to_id.get(away_team.lower())
         for player in candidates:
+            logging.info("Checking player %s with team_id %s", player.id, player.team_id)
             if player.team_id == home_team_id or player.team_id == away_team_id:
                 return player.id
         return None

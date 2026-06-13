@@ -53,7 +53,7 @@ class BallDontLieMlbAPI(SportsStatsAPIInterface):
                 id=team["id"],
                 abbreviation=team["abbreviation"],
                 display_name=team["display_name"],
-                name=team["name"],
+                name=team["display_name"],
                 location=team["location"],
                 league=team["league"],
                 division=team["division"],
