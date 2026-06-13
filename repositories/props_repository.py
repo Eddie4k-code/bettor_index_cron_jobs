@@ -58,6 +58,7 @@ class PropsRepository(PropsRepositoryInterface):
                             'sport_title': prop.sport_title,
                             'home_team': prop.home_team,
                             'away_team': prop.away_team,
+                            'player_id': outcome.player_id,
                         })
         return flat_props
 
