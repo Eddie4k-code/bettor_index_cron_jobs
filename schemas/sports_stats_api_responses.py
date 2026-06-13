@@ -2,6 +2,9 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
+
+StringOrNumber = str | int | float
+
 class TeamSchema(BaseModel):
 	id: int
 	name: str
@@ -114,20 +117,20 @@ class BallDontLieMLBPlayerStatsSchema(BaseModel):
     rbi: Optional[int] = None
     bb: Optional[int] = None
     k: Optional[int] = None
-    avg: Optional[str] = None
-    obp: Optional[str] = None
-    slg: Optional[str] = None
+    avg: Optional[StringOrNumber] = None
+    obp: Optional[StringOrNumber] = None
+    slg: Optional[StringOrNumber] = None
     doubles: Optional[int] = None
     triples: Optional[int] = None
     stolen_bases: Optional[int] = None
     plate_appearances: Optional[int] = None
     total_bases: Optional[int] = None
     # Pitching
-    ip: Optional[str] = None
+    ip: Optional[StringOrNumber] = None
     p_k: Optional[int] = None
     p_bb: Optional[int] = None
     er: Optional[int] = None
-    era: Optional[str] = None
+    era: Optional[StringOrNumber] = None
     pitch_count: Optional[int] = None
     wins: Optional[int] = None
     losses: Optional[int] = None

@@ -109,14 +109,13 @@ class BallDontLieMlbAPI(SportsStatsAPIInterface):
         stats_list = []
         for stat in stats_data:
             player = stat.get("player", {})
-            game = stat.get("game", {})
             stats_list.append(BallDontLieMLBPlayerStatsSchema(
                 player_id=player.get("id"),
                 firstname=player.get("first_name"),
                 lastname=player.get("last_name"),
                 team_name=player.get("team", {}).get("name"),
-                game_id=game.get("id"),
-                season=game.get("season"),
+                game_id=stat.get("game_id"),
+                season=season,
                 at_bats=stat.get("at_bats"),
                 hits=stat.get("hits"),
                 hr=stat.get("hr"),
@@ -142,4 +141,5 @@ class BallDontLieMlbAPI(SportsStatsAPIInterface):
                 saves=stat.get("saves"),
                 games_started=stat.get("games_started"),
             ))
+
         return BallDontLieMLBPlayerStatsResponse(stats=stats_list)

@@ -51,7 +51,7 @@ class GamesPipeline(GamesPipelineInterface):
     def process_mlb_games(self, games: list[dict], sport: str):
         for game_schema in games:
             status = (game_schema.status or "").lower()
-            if status != "final":
+            if status != "status_final":
                 continue
 
             self.games_repository.insert_games(Game(
