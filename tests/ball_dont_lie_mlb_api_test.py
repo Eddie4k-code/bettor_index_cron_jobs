@@ -120,16 +120,16 @@ def test_get_player_stats_200(api: BallDontLieMlbAPI, http_client_mock):
                     "last_name": "Judge",
                     "team": {"name": "Yankees"},
                 },
-                "game": {"id": 101, "season": 2024},
+                "game_id": 101,
                 "at_bats": 4,
                 "hits": 2,
                 "hr": 1,
                 "rbi": 2,
                 "bb": 1,
                 "k": 1,
-                "avg": ".300",
-                "obp": ".380",
-                "slg": ".600",
+                "avg": 0.300,
+                "obp": 0.380,
+                "slg": 0.600,
                 "doubles": 0,
                 "triples": 0,
                 "stolen_bases": 0,
@@ -148,8 +148,40 @@ def test_get_player_stats_200(api: BallDontLieMlbAPI, http_client_mock):
     assert stat.firstname == "Aaron"
     assert stat.lastname == "Judge"
     assert stat.team_name == "Yankees"
+    assert stat.game_id == 101
+    assert stat.season == 2024
     assert stat.hr == 1
-    assert stat.avg == ".300"
+    assert stat.avg == 0.300
+
+
+def test_get_player_stats_accepts_mixed_type_pitching_fields(api: BallDontLieMlbAPI, http_client_mock):
+    http_client_mock.get.return_value.status_code = 200
+    http_client_mock.get.return_value.json.return_value = {
+        "data": [
+            {
+                "player": {
+                    "id": 701,
+                    "first_name": "Gerrit",
+                    "last_name": "Cole",
+                    "team": {"name": "Yankees"},
+                },
+                "game_id": 401,
+                "ip": 6,
+                "p_k": 8,
+                "era": 0,
+            }
+        ]
+    }
+
+    result = api.get_player_stats(player_id=701, season=2024, sport="mlb")
+
+    assert isinstance(result, BallDontLieMLBPlayerStatsResponse)
+    assert len(result.stats) == 1
+    stat = result.stats[0]
+    assert stat.game_id == 401
+    assert stat.season == 2024
+    assert stat.ip == 6
+    assert stat.era == 0
 
 
 def test_get_games_paginates_until_next_cursor_is_null(api: BallDontLieMlbAPI, http_client_mock, mocker):
@@ -262,7 +294,7 @@ def test_get_player_stats_paginates_until_next_cursor_is_null(api: BallDontLieMl
                     "last_name": "Cole",
                     "team": {"name": "Yankees"},
                 },
-                "game": {"id": 401, "season": 2024},
+                "game_id": 401,
                 "ip": "6.0",
                 "p_k": 8,
                 "era": "2.80",
@@ -282,7 +314,7 @@ def test_get_player_stats_paginates_until_next_cursor_is_null(api: BallDontLieMl
                     "last_name": "Cole",
                     "team": {"name": "Yankees"},
                 },
-                "game": {"id": 402, "season": 2024},
+                "game_id": 402,
                 "ip": "7.0",
                 "p_k": 10,
                 "era": "2.70",
