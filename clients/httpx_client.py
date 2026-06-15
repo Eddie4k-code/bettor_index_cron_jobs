@@ -39,6 +39,13 @@ class HTTPXClient(HTTPClient):
                 else:
                     logger.error("Exceeded maximum retry attempts due to too many requests.")
                     raise
+
+            except httpx.TimeoutException as e:
+                if attempt < attempts - 1:
+                    logger.warning(f"Request timed out. Attempt {attempt + 1} of {attempts}. Retrying...")
+                    time.sleep(base_wait * (2 ** attempt))  # Exponential backoff
+                    continue  # Retry on timeout
+                
             except httpx.HTTPStatusError as e:
                 logger.error(f"HTTP error occurred: {e}")
                 raise
