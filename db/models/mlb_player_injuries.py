@@ -6,7 +6,7 @@ class MLBPlayerInjuries(Base):
     __tablename__ = 'mlb_player_injuries_ball_dont_lie'
 
     player_id = Column(Integer, nullable=False, index=True, primary_key=True)
-    team_id = Column(Integer, nullable=True)
+    team_id = Column(Integer, nullable=True, index=True, primary_key=True)
     date = Column(DateTime, nullable=True)
     return_date = Column(DateTime, nullable=True)
     display_name = Column(String, nullable=True)

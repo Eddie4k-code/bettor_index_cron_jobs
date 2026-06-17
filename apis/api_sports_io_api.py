@@ -132,4 +132,7 @@ class SportsIOAPI(SportsStatsAPIInterface):
 
         return SportsStatsAPIPlayerStatsResponse(stats=stats_list)
 
+    def get_injuries(self, team_ids: list[int]):
+        raise NotImplementedError("Injuries are not supported for SportsIO/NBA API.")
+
 

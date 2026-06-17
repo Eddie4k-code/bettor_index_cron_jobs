@@ -118,6 +118,13 @@ def test_sports_io_api_get_players_200(http_client_mock: HTTPClient, mock_api_co
     assert player.lastname == "Murray"
 
 
+def test_sports_io_api_get_injuries_raises_not_implemented(http_client_mock: HTTPClient, mock_api_config: APIConfig):
+    api = SportsIOAPI(api_config=mock_api_config, http_client=http_client_mock)
+
+    with pytest.raises(NotImplementedError, match="Injuries are not supported for SportsIO/NBA API."):
+        api.get_injuries(team_ids=[1])
+
+
 
 
 

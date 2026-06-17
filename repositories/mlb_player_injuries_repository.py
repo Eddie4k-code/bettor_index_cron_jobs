@@ -1,13 +1,13 @@
 import logging
 
 from db.models.mlb_player_injuries import MLBPlayerInjuries
-from interfaces.mlb_player_injuries_repository_interface import MLBPlayerInjuriesRepositoryInterface
+from interfaces.player_injuries_repository_interface import PlayerInjuriesRepositoryInterface
 
 
 logger = logging.getLogger(__name__)
 
 
-class MLBPlayerInjuriesRepository(MLBPlayerInjuriesRepositoryInterface):
+class MLBPlayerInjuriesRepository(PlayerInjuriesRepositoryInterface):
     def __init__(self, db):
         self.db = db
 
