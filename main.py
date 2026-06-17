@@ -24,6 +24,8 @@ from repositories.hit_rate_event_queue_repository import HitRateEventQueueReposi
 from repositories.odds_api_prop_history import OddsAPIPropsHistoryRepository
 import argparse
 from apis.ball_dont_lie_mlb_api import BallDontLieMlbAPI
+from pipelines.injuries_pipeline import InjuriesPipeline
+from repositories.mlb_player_injuries_repository import MLBPlayerInjuriesRepository
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -61,6 +63,10 @@ def main():
                                         help="Sport key (default: basketball_nba)")
     player_stats_parser.add_argument("--season", type=int, default=2023,
                                         help="Season to fetch data for (default: 2023)")
+
+    injuries_parser = subparsers.add_parser("injuries", help="Run the injuries pipeline")
+    injuries_parser.add_argument("--sport", type=str, default="baseball_mlb",
+                                    help="Sport key (default: baseball_mlb)")
 
     args = parser.parse_args()
 
@@ -107,6 +113,9 @@ def main():
                 props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
             elif args.command == "player_stats":
                 nba_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
+            elif args.command == "injuries":
+                logging.error("Injuries pipeline is only supported for baseball_mlb")
+                exit(1)
 
         elif args.sport == "baseball_mlb":
             teams_repository = TeamsRepository(db)
@@ -130,6 +139,12 @@ def main():
                 games_repository=games_repository,
                 mlb_player_stats_repository=mlb_player_stats_repository,
             )
+            mlb_player_injuries_repository = MLBPlayerInjuriesRepository(db)
+            injuries_pipeline = InjuriesPipeline(
+                teams_repository=teams_repository,
+                player_injuries_repository=mlb_player_injuries_repository,
+                api=ball_dont_lie_api_mlb,
+            )
 
             if args.command == "teams":
                 teams_pipeline.get_teams(sport=args.sport)
@@ -141,6 +156,8 @@ def main():
                 props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
             elif args.command == "player_stats":
                 mlb_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
+            elif args.command == "injuries":
+                injuries_pipeline.get_injuries(sport=args.sport)
         else:
             logging.error(f"Unsupported sport: {args.sport}")
             exit(1)
