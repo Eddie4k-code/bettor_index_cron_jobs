@@ -139,3 +139,51 @@ class BallDontLieMLBPlayerStatsSchema(BaseModel):
 
 class BallDontLieMLBPlayerStatsResponse(BaseModel):
     stats: List[BallDontLieMLBPlayerStatsSchema]
+
+
+class BallDontLieMLBInjuryTeamSchema(BaseModel):
+    id: int
+    slug: str
+    abbreviation: str
+    display_name: str
+    short_display_name: str
+    name: str
+    location: str
+    league: str
+    division: str
+
+
+class BallDontLieMLBInjuryPlayerSchema(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    full_name: str
+    debut_year: Optional[int] = None
+    jersey: Optional[str] = None
+    college: Optional[str] = None
+    position: Optional[str] = None
+    active: Optional[bool] = None
+    birth_place: Optional[str] = None
+    dob: Optional[str] = None
+    age: Optional[int] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
+    draft: Optional[str] = None
+    bats_throws: Optional[str] = None
+    team: BallDontLieMLBInjuryTeamSchema
+
+
+class BallDontLieMLBInjurySchema(BaseModel):
+    player: BallDontLieMLBInjuryPlayerSchema
+    date: Optional[str] = None
+    return_date: Optional[str] = None
+    type: Optional[str] = None
+    detail: Optional[str] = None
+    side: Optional[str] = None
+    status: Optional[str] = None
+    long_comment: Optional[str] = None
+    short_comment: Optional[str] = None
+
+
+class BallDontLieMLBInjuriesResponse(BaseModel):
+    injuries: List[BallDontLieMLBInjurySchema]

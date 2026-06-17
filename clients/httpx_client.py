@@ -30,8 +30,6 @@ class HTTPXClient(HTTPClient):
 
                 return response
             
-
-                
             except TooManyRequestsError:
                 if attempt < attempts - 1:
                     time.sleep(base_wait * (2 ** attempt))  # Exponential backoff

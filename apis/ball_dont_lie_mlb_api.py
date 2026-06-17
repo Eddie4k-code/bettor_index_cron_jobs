@@ -2,6 +2,7 @@ from interfaces.sports_stats_api_interface import SportsStatsAPIInterface
 from apis.api_config import APIConfig
 from interfaces.http_client_interface import HTTPClient
 from schemas.sports_stats_api_responses import (
+    BallDontLieMLBInjurySchema, BallDontLieMLBInjuriesResponse,
     BallDontLieMLBTeamSchema, BallDontLieMLBTeamResponse,
     BallDontLieMLBGameSchema, BallDontLieMLBGamesResponse,
     BallDontLieMLBPlayerStatsSchema, BallDontLieMLBPlayerStatsResponse,
@@ -143,3 +144,14 @@ class BallDontLieMlbAPI(SportsStatsAPIInterface):
             ))
 
         return BallDontLieMLBPlayerStatsResponse(stats=stats_list)
+
+    def get_injuries(self, team_id: int) -> BallDontLieMLBInjuriesResponse:
+        injuries_data = self._fetch_all_pages(
+            f"{self.BASE_URL}/mlb/v1/player_injuries",
+            {"team_ids[]": team_id},
+        )
+        injuries = [
+            BallDontLieMLBInjurySchema(**injury)
+            for injury in injuries_data
+        ]
+        return BallDontLieMLBInjuriesResponse(injuries=injuries)
