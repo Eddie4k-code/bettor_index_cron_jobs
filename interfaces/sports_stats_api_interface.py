@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from typing import Optional
 
 from schemas.sports_stats_api_responses import BallDontLieMLBGamesResponse, SportsStatsAPIGamesResponse
 
@@ -33,5 +32,16 @@ class SportsStatsAPIInterface(ABC):
             season (int): The season year.
         Returns:
             SportsStatsAPIPlayerStatsResponse: Response containing player stats.
+        """
+        pass
+
+    @abstractmethod
+    def get_injuries(self, team_ids: list[int]):
+        """
+        Fetch injuries for one or more teams.
+        Args:
+            team_ids (list[int]): The team IDs.
+        Returns:
+            Injuries response containing team injuries.
         """
         pass

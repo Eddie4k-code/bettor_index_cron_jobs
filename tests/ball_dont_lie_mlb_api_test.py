@@ -231,7 +231,7 @@ def test_get_injuries_200(api: BallDontLieMlbAPI, http_client_mock):
         ]
     }
 
-    result = api.get_injuries(team_id=14)
+    result = api.get_injuries(team_ids=[14])
 
     assert isinstance(result, BallDontLieMLBInjuriesResponse)
     assert len(result.injuries) == 1
@@ -342,7 +342,7 @@ def test_get_injuries_paginates_until_next_cursor_is_null(api: BallDontLieMlbAPI
 
     http_client_mock.get.side_effect = [page_1_response, page_2_response]
 
-    result = api.get_injuries(team_id=14)
+    result = api.get_injuries(team_ids=[14])
 
     assert isinstance(result, BallDontLieMLBInjuriesResponse)
     assert len(result.injuries) == 2
@@ -352,11 +352,11 @@ def test_get_injuries_paginates_until_next_cursor_is_null(api: BallDontLieMlbAPI
     assert result.injuries[1].status == "10-Day-IL"
     assert http_client_mock.get.call_count == 2
     assert http_client_mock.get.call_args_list[0].kwargs["params"] == {
-        "team_ids[]": 14,
+        "team_ids[]": [14],
         "per_page": 100,
     }
     assert http_client_mock.get.call_args_list[1].kwargs["params"] == {
-        "team_ids[]": 14,
+        "team_ids[]": [14],
         "per_page": 100,
         "cursor": 62089,
     }

@@ -145,10 +145,10 @@ class BallDontLieMlbAPI(SportsStatsAPIInterface):
 
         return BallDontLieMLBPlayerStatsResponse(stats=stats_list)
 
-    def get_injuries(self, team_id: int) -> BallDontLieMLBInjuriesResponse:
+    def get_injuries(self, team_ids: list[int]) -> BallDontLieMLBInjuriesResponse:
         injuries_data = self._fetch_all_pages(
             f"{self.BASE_URL}/mlb/v1/player_injuries",
-            {"team_ids[]": team_id},
+            {"team_ids[]": team_ids},
         )
         injuries = [
             BallDontLieMLBInjurySchema(**injury)
