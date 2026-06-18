@@ -60,6 +60,7 @@ def test_get_injuries_fetches_all_team_ids_in_one_request_and_persists_records(
                     "first_name": "Clayton",
                     "last_name": "Kershaw",
                     "full_name": "Clayton Kershaw",
+                    "position": "Pitcher",
                     "team": {
                         "id": 14,
                         "slug": "los-angeles-dodgers",
@@ -87,6 +88,7 @@ def test_get_injuries_fetches_all_team_ids_in_one_request_and_persists_records(
                     "first_name": "Player",
                     "last_name": "Two",
                     "full_name": "Player Two",
+                    "position": "Outfielder",
                     "team": {
                         "id": 15,
                         "slug": "san-diego-padres",
@@ -120,15 +122,18 @@ def test_get_injuries_fetches_all_team_ids_in_one_request_and_persists_records(
     assert first_record.player_id == 101
     assert first_record.team_id == 14
     assert first_record.display_name == "Clayton Kershaw"
+    assert first_record.position == "Pitcher"
     assert first_record.date == datetime(2024, 3, 1, 0, 0, tzinfo=timezone.utc)
     assert first_record.return_date == datetime(2024, 4, 15, 0, 0, tzinfo=timezone.utc)
 
     second_record = player_injuries_repository.insert_player_injury.call_args_list[1].args[0]
     assert second_record.player_id == 202
     assert second_record.team_id == 15
+    assert second_record.position == "Outfielder"
     assert second_record.return_date is None
     assert second_record.short_comment == "hamstring strain"
 
     assert len(result) == 2
     assert result[0]["player"]["id"] == 101
+    assert result[0]["player"]["position"] == "Pitcher"
     assert result[1]["player"]["team"]["id"] == 15

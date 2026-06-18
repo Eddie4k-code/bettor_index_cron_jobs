@@ -55,6 +55,7 @@ class InjuriesPipeline(InjuriesPipelineInterface):
             date=self._parse_datetime(injury.date),
             return_date=self._parse_datetime(injury.return_date),
             display_name=injury.player.full_name,
+            position=injury.player.position,
             type=injury.type,
             detail=injury.detail,
             side=injury.side,

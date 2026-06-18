@@ -10,6 +10,7 @@ class MLBPlayerInjuries(Base):
     date = Column(DateTime, nullable=True)
     return_date = Column(DateTime, nullable=True)
     display_name = Column(String, nullable=True)
+    position = Column(String, nullable=True)
     type = Column(String, nullable=True)
     detail = Column(String, nullable=True)
     side = Column(String, nullable=True)
