@@ -32,6 +32,7 @@ def test_insert_player_injury_persists_record(repo):
         date=datetime.fromisoformat("2024-11-05T23:32:00+00:00"),
         return_date=datetime.fromisoformat("2025-02-01T00:00:00+00:00"),
         display_name="Shohei Ohtani",
+        position="Designated Hitter",
         type="Shoulder",
         detail="Surgery",
         side="Left",
@@ -48,6 +49,7 @@ def test_insert_player_injury_persists_record(repo):
     assert result is not None
     assert result.team_id == 14
     assert result.display_name == "Shohei Ohtani"
+    assert result.position == "Designated Hitter"
     assert result.type == "Shoulder"
     assert result.status == "Out"
 
