@@ -20,4 +20,5 @@ class HitRateEventQueue(Base):
     status = Column(String, nullable=False, default='pending')
     event_type = Column(String, nullable=False)
     player_id = Column(Integer, nullable=True)
+    player_team_id = Column(Integer, nullable=True)
 

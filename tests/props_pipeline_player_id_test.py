@@ -27,6 +27,17 @@ class DummyHistoryRepo:
         self.history.append(history)
 
 
+class DummyPlayersRepository:
+    def get_player_by_id(self, player_id, sport_key):
+        class Player:
+            pass
+
+        player = Player()
+        player.id = player_id
+        player.team_id = 12
+        return player
+
+
 def make_prop(player_id, point=1.5, price=-110):
     return OddsAPIProp(
         id='evt1',
@@ -87,7 +98,7 @@ def make_pipeline(repo):
         hit_rate_event_queue_repo=DummyEventQueueRepo(),
         odds_api_prop_history_repo=DummyHistoryRepo(),
         teams_repository=None,
-        players_repository=None,
+        players_repository=DummyPlayersRepository(),
     )
 
 
@@ -100,6 +111,7 @@ def test_detect_and_produce_hit_rate_events_uses_outcome_player_id_for_new_prop(
 
     assert len(pipeline.hit_rate_event_queue_repo.events) == 1
     assert pipeline.hit_rate_event_queue_repo.events[0].player_id == 58
+    assert pipeline.hit_rate_event_queue_repo.events[0].player_team_id == 12
 
 
 def test_detect_and_produce_hit_rate_events_falls_back_to_existing_player_id():
@@ -111,6 +123,7 @@ def test_detect_and_produce_hit_rate_events_falls_back_to_existing_player_id():
 
     assert len(pipeline.hit_rate_event_queue_repo.events) == 1
     assert pipeline.hit_rate_event_queue_repo.events[0].player_id == 58
+    assert pipeline.hit_rate_event_queue_repo.events[0].player_team_id == 12
     assert pipeline.odds_api_prop_history_repo.history[0].player_id == 58
 
 
