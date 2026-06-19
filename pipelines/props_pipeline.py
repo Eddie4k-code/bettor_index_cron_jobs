@@ -66,6 +66,7 @@ class PropsPipeline(PropsPipelineInterface):
                             outcome.description, prop.home_team, prop.away_team, prop.sport_key,
                             self.players_repository, team_name_to_id
                         )
+                        
                         if player_id is not None:
                             outcome.player_id = player_id
                         else:
@@ -85,6 +86,11 @@ class PropsPipeline(PropsPipelineInterface):
             props (list): List of prop objects to check for price changes.
         """
         for prop in props:
+            home_team_id, away_team_id = self._find_home_away_team_ids_for_prop(
+                prop.home_team,
+                prop.away_team,
+                prop.sport_key,
+            )
             for bookermakers in prop.bookmakers:
                 for market in bookermakers.markets:
                     for outcome in market.outcomes:
@@ -126,7 +132,9 @@ class PropsPipeline(PropsPipelineInterface):
                                     status='pending',
                                     event_type='PropUpdate',
                                     player_id=resolved_player_id,
-                                    player_team_id=resolved_player_team_id
+                                    player_team_id=resolved_player_team_id,
+                                    home_team_id=home_team_id,
+                                    away_team_id=away_team_id,
                                 )
                                 self.hit_rate_event_queue_repo.produce_event(event)
                                 self.odds_api_prop_history_repo.insert_props_history(
@@ -193,7 +201,9 @@ class PropsPipeline(PropsPipelineInterface):
                                 status='pending',
                                 event_type='NewProp',
                                 player_id=resolved_player_id,
-                                player_team_id=resolved_player_team_id
+                                player_team_id=resolved_player_team_id,
+                                home_team_id=home_team_id,
+                                away_team_id=away_team_id,
                             )
 
                             self.hit_rate_event_queue_repo.produce_event(event)
@@ -236,6 +246,28 @@ class PropsPipeline(PropsPipelineInterface):
         except Exception as exc:
             logger.error("Error resolving team_id for player_id=%s sport_key=%s: %s", player_id, sport_key, exc)
             return None
+
+    def _find_home_away_team_ids_for_prop(self, home_team: str, away_team: str, sport_key: str):
+        if self.teams_repository is None or not sport_key:
+            return None, None
+
+        try:
+            team_name_to_id = {
+                team.name.lower(): team.id
+                for team in self.teams_repository.get_teams(sport_key)
+            }
+            home_team_id = team_name_to_id.get(home_team.lower()) if home_team else None
+            away_team_id = team_name_to_id.get(away_team.lower()) if away_team else None
+            return home_team_id, away_team_id
+        except Exception as exc:
+            logger.error(
+                "Error resolving home/away team ids for sport_key=%s home_team=%s away_team=%s: %s",
+                sport_key,
+                home_team,
+                away_team,
+                exc,
+            )
+            return None, None
 
 
 

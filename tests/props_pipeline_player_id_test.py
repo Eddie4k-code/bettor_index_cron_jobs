@@ -38,6 +38,22 @@ class DummyPlayersRepository:
         return player
 
 
+class DummyTeamsRepository:
+    def get_teams(self, sport):
+        class Team:
+            pass
+
+        home = Team()
+        home.name = 'tampa bay rays'
+        home.id = 12
+
+        away = Team()
+        away.name = 'los angeles angels'
+        away.id = 13
+
+        return [home, away]
+
+
 def make_prop(player_id, point=1.5, price=-110):
     return OddsAPIProp(
         id='evt1',
@@ -97,7 +113,7 @@ def make_pipeline(repo):
         api=None,
         hit_rate_event_queue_repo=DummyEventQueueRepo(),
         odds_api_prop_history_repo=DummyHistoryRepo(),
-        teams_repository=None,
+        teams_repository=DummyTeamsRepository(),
         players_repository=DummyPlayersRepository(),
     )
 
@@ -112,6 +128,8 @@ def test_detect_and_produce_hit_rate_events_uses_outcome_player_id_for_new_prop(
     assert len(pipeline.hit_rate_event_queue_repo.events) == 1
     assert pipeline.hit_rate_event_queue_repo.events[0].player_id == 58
     assert pipeline.hit_rate_event_queue_repo.events[0].player_team_id == 12
+    assert pipeline.hit_rate_event_queue_repo.events[0].home_team_id == 12
+    assert pipeline.hit_rate_event_queue_repo.events[0].away_team_id == 13
 
 
 def test_detect_and_produce_hit_rate_events_falls_back_to_existing_player_id():
@@ -124,6 +142,8 @@ def test_detect_and_produce_hit_rate_events_falls_back_to_existing_player_id():
     assert len(pipeline.hit_rate_event_queue_repo.events) == 1
     assert pipeline.hit_rate_event_queue_repo.events[0].player_id == 58
     assert pipeline.hit_rate_event_queue_repo.events[0].player_team_id == 12
+    assert pipeline.hit_rate_event_queue_repo.events[0].home_team_id == 12
+    assert pipeline.hit_rate_event_queue_repo.events[0].away_team_id == 13
     assert pipeline.odds_api_prop_history_repo.history[0].player_id == 58
 
 
