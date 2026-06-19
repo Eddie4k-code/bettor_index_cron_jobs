@@ -21,4 +21,6 @@ class HitRateEventQueue(Base):
     event_type = Column(String, nullable=False)
     player_id = Column(Integer, nullable=True)
     player_team_id = Column(Integer, nullable=True)
+    home_team_id = Column(Integer, nullable=True)
+    away_team_id = Column(Integer, nullable=True)
 
