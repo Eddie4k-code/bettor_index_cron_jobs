@@ -33,3 +33,16 @@ class PlayersRepositoryInterface(ABC):
         Returns:
             list[Player]: List of Player objects matching the name and sport.
         """
+        pass
+
+    @abstractmethod
+    def get_player_by_id(self, player_id: int, sport: str):
+        """
+        Fetch a player by their ID and sport.
+        Args:
+            player_id (int): The player ID.
+            sport (str): The sport key to filter players by.
+        Returns:
+            Player | None: The matching player object, if found.
+        """
+        pass

@@ -30,6 +30,11 @@ class DummyAPI:
     def get_props_based_on_events(self, sport, events, markets):
         return self.props
 
+
+class DummyPlayersRepository:
+    def get_player_by_id(self, player_id, sport_key):
+        return None
+
 def make_existing(point, price):
     class Obj:
         pass
@@ -71,7 +76,11 @@ def make_prop(point, price):
     bookmaker.key = 'bm'
     bookmaker.markets = [market]
     prop = Prop()
-    prop.event_id = 'evt1'
+    prop.id = 'evt1'
+    prop.sport_key = 'basketball_nba'
+    prop.commence_time = '2024-01-01T00:00:00Z'
+    prop.home_team = 'Lakers'
+    prop.away_team = 'Warriors'
     prop.bookmakers = [bookmaker]
     return prop
 
@@ -89,7 +98,7 @@ def test_history_and_event_logic(old_point, old_price, new_point, new_price, exp
     api = DummyAPI()
     prop = make_prop(new_point, new_price)
     api.props = [prop]
-    pipeline = PropsPipeline(repo, api, event_repo, history_repo)
+    pipeline = PropsPipeline(repo, api, event_repo, history_repo, None, DummyPlayersRepository())
     pipeline.detect_and_produce_hit_rate_events([prop])
     if expect_event:
         assert len(event_repo.events) == 1, "Should produce event"

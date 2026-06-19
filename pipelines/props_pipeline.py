@@ -95,9 +95,13 @@ class PropsPipeline(PropsPipelineInterface):
                             outcome_name=outcome.name,
                             outcome_description=outcome.description
                         )
-                        resolved_player_id = outcome.player_id
+                        resolved_player_id = getattr(outcome, 'player_id', None)
                         if resolved_player_id is None and existing is not None:
                             resolved_player_id = getattr(existing, 'player_id', None)
+                        resolved_player_team_id = self._find_player_team_id_for_prop(
+                            resolved_player_id,
+                            existing.sport_key if existing else prop.sport_key
+                        )
                         # If there is an existing prop and the outcome point has changed, produce a hit rate event
                         if existing:
                             point_changed = existing.outcome_point != outcome.point
@@ -121,7 +125,8 @@ class PropsPipeline(PropsPipelineInterface):
                                     created_at=datetime.utcnow(),
                                     status='pending',
                                     event_type='PropUpdate',
-                                    player_id=resolved_player_id
+                                    player_id=resolved_player_id,
+                                    player_team_id=resolved_player_team_id
                                 )
                                 self.hit_rate_event_queue_repo.produce_event(event)
                                 self.odds_api_prop_history_repo.insert_props_history(
@@ -187,7 +192,8 @@ class PropsPipeline(PropsPipelineInterface):
                                 created_at=datetime.utcnow(),
                                 status='pending',
                                 event_type='NewProp',
-                                player_id=resolved_player_id
+                                player_id=resolved_player_id,
+                                player_team_id=resolved_player_team_id
                             )
 
                             self.hit_rate_event_queue_repo.produce_event(event)
@@ -217,6 +223,19 @@ class PropsPipeline(PropsPipelineInterface):
             if player.team_id == home_team_id or player.team_id == away_team_id:
                 return player.id
         return None
+    
+    def _find_player_team_id_for_prop(self, player_id: int, sport_key: str):
+        if player_id is None or self.players_repository is None or not sport_key:
+            return None
+
+        try:
+            player = self.players_repository.get_player_by_id(player_id, sport_key)
+            if player is None:
+                return None
+            return getattr(player, 'team_id', None)
+        except Exception as exc:
+            logger.error("Error resolving team_id for player_id=%s sport_key=%s: %s", player_id, sport_key, exc)
+            return None
 
 
 

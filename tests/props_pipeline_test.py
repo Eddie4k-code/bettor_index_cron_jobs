@@ -14,6 +14,16 @@ from repositories.props_repository import PropsRepository
 from interfaces.props_repository_interface import PropsRepositoryInterface
 
 
+class DummyEventQueueRepo:
+    def produce_event(self, event):
+        return None
+
+
+class DummyHistoryRepo:
+    def insert_props_history(self, history):
+        return None
+
+
 @pytest.fixture(scope="function")
 def db_session():
     # Use in-memory SQLite for testing
@@ -85,7 +95,23 @@ def test_props_pipeline_get_props_successful_insertion(db_session, betting_data_
 
     # Create repository and pipeline
     repository = PropsRepository(db_session)
-    pipeline = PropsPipeline(db=repository, api=betting_data_api)
+    teams_repository = type("TeamsRepositoryStub", (), {"get_teams": lambda self, sport: []})()
+    players_repository = type(
+        "PlayersRepositoryStub",
+        (),
+        {
+            "get_player_by_name": lambda self, first, last, sport: [],
+            "get_player_by_id": lambda self, player_id, sport: None,
+        },
+    )()
+    pipeline = PropsPipeline(
+        db=repository,
+        api=betting_data_api,
+        hit_rate_event_queue_repo=DummyEventQueueRepo(),
+        odds_api_prop_history_repo=DummyHistoryRepo(),
+        teams_repository=teams_repository,
+        players_repository=players_repository,
+    )
     # Run pipeline
     pipeline.get_props(hours_ahead=24, sport="basketball_nba", markets="player_points")
     # Verify props were saved in the database
