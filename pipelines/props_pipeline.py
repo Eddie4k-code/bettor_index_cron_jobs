@@ -55,8 +55,8 @@ class PropsPipeline(PropsPipelineInterface):
         For each prop, we want to try to match it to a player in our database. We can do this by looking at the outcome description and trying to extract a player name, then matching that player name to a player in our database who plays for one of the teams in the event. This is not perfect and may not match every prop to a player, but it should allow us to link many props to players in our database which will be important for calculating hit rates and other stats later on when we want to analyze how well our model is doing at predicting prop outcomes.
         """
 
-        # Build team name to ID mapping once using the injected teams_repository
-        team_name_to_id = {team.name.lower(): team.id for team in self.teams_repository.get_teams(sport)}
+        # Build team name to ID mapping once and reuse it throughout this run.
+        team_name_to_id = self._build_team_name_to_id_map(sport)
 
         for prop in props:
             for bookmaker in prop.bookmakers:
@@ -72,24 +72,29 @@ class PropsPipeline(PropsPipelineInterface):
                         else:
                             outcome.player_id = None  # or log/flag as unmatched
 
-        self.detect_and_produce_hit_rate_events(props)
+        self.detect_and_produce_hit_rate_events(props, team_name_to_id)
 
         logger.info(f"Fetched props for {len(props)} events. Storing in database.")
         self.db.save_props(props)
         logger.info("Props stored in database successfully.")
 
 
-    def detect_and_produce_hit_rate_events(self, props):
+    def detect_and_produce_hit_rate_events(self, props, team_name_to_id=None):
         """
         Detect changes in prop prices and produce hit rate events for any changes detected.
         Args:
             props (list): List of prop objects to check for price changes.
         """
         for prop in props:
+            # Reuse the map from get_props when provided; fallback only for direct calls/tests.
+            current_team_map = team_name_to_id
+            if current_team_map is None:
+                current_team_map = self._build_team_name_to_id_map(prop.sport_key)
+
             home_team_id, away_team_id = self._find_home_away_team_ids_for_prop(
                 prop.home_team,
                 prop.away_team,
-                prop.sport_key,
+                current_team_map,
             )
             for bookermakers in prop.bookmakers:
                 for market in bookermakers.markets:
@@ -226,8 +231,8 @@ class PropsPipeline(PropsPipelineInterface):
         candidates = players_repository.get_player_by_name(first, last, sport)
         logging.info("Found %d candidates for player name '%s %s'", len(candidates), first, last)
         # Map team names to IDs for comparison
-        home_team_id = team_name_to_id.get(home_team.lower())
-        away_team_id = team_name_to_id.get(away_team.lower())
+        home_team_id = self._resolve_team_id(home_team, team_name_to_id)
+        away_team_id = self._resolve_team_id(away_team, team_name_to_id)
         for player in candidates:
             logging.info("Checking player %s with team_id %s", player.id, player.team_id)
             if player.team_id == home_team_id or player.team_id == away_team_id:
@@ -247,27 +252,50 @@ class PropsPipeline(PropsPipelineInterface):
             logger.error("Error resolving team_id for player_id=%s sport_key=%s: %s", player_id, sport_key, exc)
             return None
 
-    def _find_home_away_team_ids_for_prop(self, home_team: str, away_team: str, sport_key: str):
+    def _build_team_name_to_id_map(self, sport_key: str):
         if self.teams_repository is None or not sport_key:
-            return None, None
+            return {}
 
         try:
-            team_name_to_id = {
-                team.name.lower(): team.id
-                for team in self.teams_repository.get_teams(sport_key)
-            }
-            home_team_id = team_name_to_id.get(home_team.lower()) if home_team else None
-            away_team_id = team_name_to_id.get(away_team.lower()) if away_team else None
-            return home_team_id, away_team_id
+            teams = self.teams_repository.get_teams(sport_key)
+            team_name_to_id = {}
+            for team in teams:
+                for alias in [getattr(team, 'name', None), getattr(team, 'nickname', None)]:
+                    normalized = self._normalize_team_name(alias)
+                    if normalized and normalized not in team_name_to_id:
+                        team_name_to_id[normalized] = team.id
+            return team_name_to_id
         except Exception as exc:
-            logger.error(
-                "Error resolving home/away team ids for sport_key=%s home_team=%s away_team=%s: %s",
-                sport_key,
-                home_team,
-                away_team,
-                exc,
-            )
-            return None, None
+            logger.error("Error building team map for sport_key=%s: %s", sport_key, exc)
+            return {}
+
+    def _find_home_away_team_ids_for_prop(self, home_team: str, away_team: str, team_name_to_id: dict):
+        home_team_id = self._resolve_team_id(home_team, team_name_to_id)
+        away_team_id = self._resolve_team_id(away_team, team_name_to_id)
+        logger.info("Resolved home team '%s' to ID %s", home_team, home_team_id)
+        logger.info("Resolved away team '%s' to ID %s", away_team, away_team_id)
+        return home_team_id, away_team_id
+
+    def _resolve_team_id(self, team_name: str, team_name_to_id: dict):
+        normalized = self._normalize_team_name(team_name)
+        if not normalized or not team_name_to_id:
+            return None
+
+        exact = team_name_to_id.get(normalized)
+        if exact is not None:
+            return exact
+
+        # Fallback for naming differences like "Athletics" vs "Oakland Athletics".
+        for key, team_id in team_name_to_id.items():
+            if key.endswith(f" {normalized}") or normalized.endswith(f" {key}"):
+                return team_id
+        return None
+
+    def _normalize_team_name(self, value: str):
+        if not value:
+            return None
+        normalized = value.strip().lower().replace('.', '').replace('-', ' ')
+        return ' '.join(normalized.split())
 
 
 

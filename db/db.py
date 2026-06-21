@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.models.base import Base
+import db.models  # noqa: F401  # Ensure model metadata is registered before create_all.
 import os
 from contextlib import contextmanager
 from dotenv import load_dotenv
