@@ -1,6 +1,5 @@
 from db.models.base import Base
-from sqlalchemy import Column, Integer, String, Float, DateTime
-
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
 
 class OddsAPIPropHistory(Base):
     __tablename__ = 'odds_api_props_history'
@@ -22,4 +21,4 @@ class OddsAPIPropHistory(Base):
     away_team = Column(String)
     change_type = Column(String)  # e.g., 'PointChange', 'PriceChange'
     player_id = Column(Integer, nullable=True)  # New field to link to player if applicable
-    
+    analyzed = Column(Boolean, nullable=False, default=False)  # New field to track if the record has been analyzed
