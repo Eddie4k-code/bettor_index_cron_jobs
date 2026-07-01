@@ -110,7 +110,11 @@ def main():
             elif args.command == "players":
                 players_pipeline.get_players(sport=args.sport, season=args.season)
             elif args.command == "props":
-                props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
+                props_pipeline.get_props(
+                    sport=args.sport,
+                    hours_ahead=args.hours_ahead,
+                    markets=",".join(m.strip() for m in args.markets.split(",") if m.strip()),
+                )
             elif args.command == "player_stats":
                 nba_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
             elif args.command == "injuries":
@@ -153,7 +157,11 @@ def main():
             elif args.command == "players":
                 players_pipeline.get_players(sport=args.sport, season=args.season)
             elif args.command == "props":
-                props_pipeline.get_props(sport=args.sport, hours_ahead=args.hours_ahead, markets=args.markets.split(","))
+                props_pipeline.get_props(
+                    sport=args.sport,
+                    hours_ahead=args.hours_ahead,
+                    markets=",".join(m.strip() for m in args.markets.split(",") if m.strip()),
+                )
             elif args.command == "player_stats":
                 mlb_player_stats_pipeline.get_player_stats(sport=args.sport, season=args.season)
             elif args.command == "injuries":
