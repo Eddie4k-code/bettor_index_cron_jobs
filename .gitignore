@@ -63,9 +63,11 @@ Pipfile.lock
 .vscode/
 
 # Local env
+.env
 .venv/
 venv/
 ENV/
+.cursor/debug*.log
 
 # Mac
 .DS_Store
