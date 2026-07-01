@@ -187,3 +187,141 @@ class BallDontLieMLBInjurySchema(BaseModel):
 
 class BallDontLieMLBInjuriesResponse(BaseModel):
     injuries: List[BallDontLieMLBInjurySchema]
+
+
+# --- BallDontLie NFL schemas ---
+
+class BallDontLieNFLTeamSchema(BaseModel):
+    id: int
+    abbreviation: str
+    full_name: str
+    name: str
+    location: str
+    conference: str
+    division: str
+
+class BallDontLieNFLTeamResponse(BaseModel):
+    teams: List[BallDontLieNFLTeamSchema]
+
+class BallDontLieNFLGameSchema(BaseModel):
+    id: int
+    season: int
+    week: Optional[int] = None
+    date: Optional[str] = None
+    status: Optional[str] = None
+    postseason: Optional[bool] = None
+    home_team_name: str
+    home_team_id: int
+    away_team_name: str
+    away_team_id: int
+    home_team_score: Optional[int] = None
+    away_team_score: Optional[int] = None
+
+class BallDontLieNFLGamesResponse(BaseModel):
+    games: List[BallDontLieNFLGameSchema]
+
+class BallDontLieNFLPlayerStatsSchema(BaseModel):
+    player_id: int
+    firstname: str
+    lastname: str
+    team_name: Optional[str] = None
+    game_id: int
+    season: int
+    # Passing
+    passing_completions: Optional[int] = None
+    passing_attempts: Optional[int] = None
+    passing_yards: Optional[int] = None
+    yards_per_pass_attempt: Optional[StringOrNumber] = None
+    passing_touchdowns: Optional[int] = None
+    passing_interceptions: Optional[int] = None
+    sacks: Optional[int] = None
+    sacks_loss: Optional[int] = None
+    qbr: Optional[StringOrNumber] = None
+    qb_rating: Optional[StringOrNumber] = None
+    # Rushing
+    rushing_attempts: Optional[int] = None
+    rushing_yards: Optional[int] = None
+    yards_per_rush_attempt: Optional[StringOrNumber] = None
+    rushing_touchdowns: Optional[int] = None
+    long_rushing: Optional[int] = None
+    # Receiving
+    receptions: Optional[int] = None
+    receiving_yards: Optional[int] = None
+    yards_per_reception: Optional[StringOrNumber] = None
+    receiving_touchdowns: Optional[int] = None
+    long_reception: Optional[int] = None
+    receiving_targets: Optional[int] = None
+    # Fumbles
+    fumbles: Optional[int] = None
+    fumbles_lost: Optional[int] = None
+    fumbles_recovered: Optional[int] = None
+    # Defense
+    total_tackles: Optional[int] = None
+    defensive_sacks: Optional[int] = None
+    solo_tackles: Optional[int] = None
+    tackles_for_loss: Optional[int] = None
+    passes_defended: Optional[int] = None
+    qb_hits: Optional[int] = None
+    fumbles_touchdowns: Optional[int] = None
+    defensive_interceptions: Optional[int] = None
+    interception_yards: Optional[int] = None
+    interception_touchdowns: Optional[int] = None
+    # Kick returns
+    kick_returns: Optional[int] = None
+    kick_return_yards: Optional[int] = None
+    yards_per_kick_return: Optional[StringOrNumber] = None
+    long_kick_return: Optional[int] = None
+    kick_return_touchdowns: Optional[int] = None
+    # Punt returns
+    punt_returns: Optional[int] = None
+    punt_return_yards: Optional[int] = None
+    yards_per_punt_return: Optional[StringOrNumber] = None
+    long_punt_return: Optional[int] = None
+    punt_return_touchdowns: Optional[int] = None
+    # Kicking / punting
+    field_goal_attempts: Optional[int] = None
+    field_goals_made: Optional[int] = None
+    field_goal_pct: Optional[StringOrNumber] = None
+    long_field_goal_made: Optional[int] = None
+    extra_points_made: Optional[int] = None
+    total_points: Optional[int] = None
+    punts: Optional[int] = None
+    punt_yards: Optional[int] = None
+    gross_avg_punt_yards: Optional[StringOrNumber] = None
+    touchbacks: Optional[int] = None
+    punts_inside_20: Optional[int] = None
+    long_punt: Optional[int] = None
+
+class BallDontLieNFLPlayerStatsResponse(BaseModel):
+    stats: List[BallDontLieNFLPlayerStatsSchema]
+
+
+class BallDontLieNFLInjuryTeamSchema(BaseModel):
+    id: int
+    abbreviation: str
+    full_name: str
+    name: str
+    location: str
+    conference: str
+    division: str
+
+
+class BallDontLieNFLInjuryPlayerSchema(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    position: Optional[str] = None
+    position_abbreviation: Optional[str] = None
+    jersey_number: Optional[str] = None
+    team: BallDontLieNFLInjuryTeamSchema
+
+
+class BallDontLieNFLInjurySchema(BaseModel):
+    player: BallDontLieNFLInjuryPlayerSchema
+    status: Optional[str] = None
+    comment: Optional[str] = None
+    date: Optional[str] = None
+
+
+class BallDontLieNFLInjuriesResponse(BaseModel):
+    injuries: List[BallDontLieNFLInjurySchema]
